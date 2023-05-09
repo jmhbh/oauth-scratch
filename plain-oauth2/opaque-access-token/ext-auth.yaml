@@ -1,0 +1,45 @@
+apiVersion: security.policy.gloo.solo.io/v2
+kind: ExtAuthPolicy
+metadata:
+  name: petstore-oauth2
+  namespace: petstore
+spec:
+  applyToRoutes:
+    - route:
+        labels:
+          usagePlans: dev-portal
+  config:
+    server:
+      name: ext-auth-server
+      namespace: gloo-mesh-addons
+      cluster: cluster-1
+    glooAuth:
+      configs:
+        - oauth2:
+            oauth2Config:
+              appUrl: http://localhost:31080
+              authEndpoint: http://localhost:8080/auth/realms/master/protocol/openid-connect/auth
+              tokenEndpoint: http://localhost:8080/auth/realms/master/protocol/openid-connect/token
+              callbackPath: /cb
+              clientId: 7465b037-8815-486f-abd4-c170fc1dade0
+              clientSecretRef:
+                name: oauth
+                namespace: gloo-mesh-addons
+              scopes:
+                - email
+              session:
+                failOnFetchFailure: true
+                cookie:
+                  allowRefreshing: true
+                cookieOptions:
+                  notSecure: true
+                  maxAge: 3600
+              headers:
+                accessTokenHeader: access_token # This is currently missing from the implementation
+              introspectionValidation: # the introspectionValidation API is a suggested change to the oauth2Config API to support opaque tokens
+                introspectionUrl: http://localhost:8080/auth/realms/master/protocol/openid-connect/token/introspect
+                clientId: 7465b037-8815-486f-abd4-c170fc1dade0
+                clientSecretRef:
+                  name: oauth
+                  namespace: gloo-mesh-addons
+                userIdAttributeName: sub
