@@ -43,8 +43,8 @@ spec:
                   name: oauth
                   namespace: gloo-mesh-addons
                 userIdAttributeName: sub
-                claimsToHeaders: # the claimsToHeaders API is one option we could use to allow users to map claims to headers for an opaque token
-                  - claim: sub
-                    header: x-user-id
-                  - claim: usage_plan
-                    header: x-usage-plan
+              claimsToHeaders: # the claimsToHeaders API is one option we could use to allow users to map claims to headers for an opaque token
+                - claim: sub
+                  header: x-user-id
+                - claim: usage_plan
+                  header: x-usage-plan
