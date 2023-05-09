@@ -22,5 +22,5 @@ spec:
             header: 'x-issuer'
             regex: '*'
         headers:
-          x-solo-plan:
+          x-user-id:
             text: "{{ userId ~ - ~ issuer}}"
