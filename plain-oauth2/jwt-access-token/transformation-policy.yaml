@@ -1,0 +1,26 @@
+apiVersion: trafficcontrol.policy.gloo.solo.io/v2
+kind: TransformationPolicy
+metadata:
+  name: modify-header
+  namespace: gloo-mesh-addons
+spec:
+  applyToRoutes:
+    - route:
+        labels:
+          oauth: "true"
+  config:
+    phase:
+      postAuthz:
+        priority: 2
+    request:
+      injaTemplate:
+        extractors:
+          userId:
+            header: 'x-user-id'
+            regex: '*'
+          issuer:
+            header: 'x-issuer'
+            regex: '*'
+        headers:
+          x-solo-plan:
+            text: "{{ userId ~ - ~ issuer}}"

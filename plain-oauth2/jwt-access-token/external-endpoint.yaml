@@ -1,0 +1,12 @@
+apiVersion: networking.gloo.solo.io/v2
+kind: ExternalEndpoint
+metadata:
+  name: keycloak
+  namespace: gloo-mesh-addons
+  labels:
+    host: keycloak
+spec:
+  address: localhost
+  ports:
+    - name: http
+      number: 8080

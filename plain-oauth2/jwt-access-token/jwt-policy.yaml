@@ -1,0 +1,36 @@
+# Adding custom claims to id/accessToken https://auth0.com/docs/get-started/apis/scopes/sample-use-cases-scopes-and-claims?_gl=1*1qbaehv*rollup_ga*NzA5OTQwNzI5LjE2Njg0NTY3MzA.*rollup_ga_F1G3E656YZ*MTY4MzU4NDk5OS40LjEuMTY4MzU4NTAyMC4zOS4wLjA.&_ga=2.91670426.1268284633.1683584999-709940729.1668456730#add-custom-claims-to-a-token
+apiVersion: security.policy.gloo.solo.io/v2
+kind: JWTPolicy
+metadata:
+  name: petstore-jwt
+  namespace: petstore
+spec:
+  applyToRoutes:
+    - route:
+        labels:
+          usagePlans: dev-portal
+  config:
+    phase:
+      postAuthz:
+        priority: 1
+    providers:
+      oauth2Provider:
+        issuer: http://localhost:8080/auth/realms/master
+        tokenSource:
+          headers:
+            - name: access_token # This has to align with the header name that is injected by the ext-auth-service configured via the oauth2 policy
+        remote:
+          url: http://localhost:8080/auth/realms/master/protocol/openid-connect/certs # this is the jwks_uri used to fetch the public key(s) used to verify any JWTs issued by the issuer.
+          destinationRef:
+            kind: EXTERNAL_SERVICE
+            ref:
+              name: keycloak
+            port:
+              number: 8080
+        claimsToHeaders:
+          - claim: usage_plan
+            header: x-solo-plan
+          - claim: sub
+            header: x-user-id
+          - claim: iss
+            header: x-issuer # we may want to use the issuer upstream with the user id to uniquely identify the user
